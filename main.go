@@ -2,20 +2,23 @@ package main
 
 import (
 	"fmt"
-	"time"
 )
 
-func main() {
-	for i:=0; i<10; i++ {
-		go expensiveTask(i)
+func sum(numbers []int, channel chan int) {
+	sum := 0
+	for _, num := range numbers {
+		sum += num
 	}
-	time.Sleep(2 * time.Second)
+	channel <- sum
 }
 
-func expensiveTask(value int) {
-	time.Sleep(1 * time.Second)
-	fmt.Println("Ran using value", value)
+func main() {
+	numbers := []int{1, 2, 3, 4, 5, 6}
+	channel := make(chan int)
+	go sum(numbers[:len(numbers)/2], channel)
+	go sum(numbers[len(numbers)/2:], channel)
+	fmt.Println("First gotten result", <- channel)
+	secondResult := <- channel
+	fmt.Println("Second gotten result", secondResult)
 }
-
-
 
