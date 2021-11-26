@@ -2,31 +2,31 @@ package main
 
 import (
     "fmt"
-    "time"
 )
 
-func oneSecondTask(results chan string){
-    time.Sleep(time.Second)
-    results <- "Done"
-}
-
-func twoSecondsTask(results chan string){
-    time.Sleep(2 * time.Second)
-    results <- "Done"
+func randomDigits(results chan int, limit int){
+    for i := 0; i < limit; i++ {
+        select{
+        case results <- 0:
+        case results <- 1:
+        case results <- 2:
+        case results <- 3:
+        case results <- 4:
+        case results <- 5:
+        case results <- 6:
+        case results <- 7:
+        case results <- 8:
+        case results <- 9:
+        }
+    }
+    close(results)
 }
 
 func main() {
-    channel1 := make(chan string)
-    channel2 := make(chan string)
-    go oneSecondTask(channel1)
-    go twoSecondsTask(channel2)
-    select {
-    case <- channel1:
-        fmt.Println("Received from first channel")
-    case res := <- channel2:
-        fmt.Println("Received from second channel", res)
-    default:
-        fmt.Println("Neither made it on time") //Always available
+    series := make(chan int)
+    go randomDigits(series, 10)
+    for number := range series {
+        fmt.Println(number)
     } 
 }
 
