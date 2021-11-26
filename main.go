@@ -1,33 +1,24 @@
 package main
 
 import (
-    "fmt"
+	"fmt"
+	"time"
 )
 
-func randomDigits(results chan int, limit int){
-    for i := 0; i < limit; i++ {
-        select{
-        case results <- 0:
-        case results <- 1:
-        case results <- 2:
-        case results <- 3:
-        case results <- 4:
-        case results <- 5:
-        case results <- 6:
-        case results <- 7:
-        case results <- 8:
-        case results <- 9:
-        }
-    }
-    close(results)
+func twoSecondsTask(results chan string){
+    time.Sleep(2 * time.Second)
+    results <- "result"
 }
 
 func main() {
-    series := make(chan int)
-    go randomDigits(series, 10)
-    for number := range series {
-        fmt.Println(number)
-    } 
+    results := make(chan string)
+    go twoSecondsTask(results)
+    select {
+    case <- results:
+        fmt.Println("2 seconds task done")
+    case <- time.After(time.Second):
+        fmt.Println("timeout!") //Happens first
+    }
 }
 
 
