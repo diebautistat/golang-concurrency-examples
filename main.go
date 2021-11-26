@@ -22,9 +22,11 @@ func main() {
     go twoSecondsTask(channel2)
     select {
     case <- channel1:
-        fmt.Println("Received from first channel") //Happens first
+        fmt.Println("Received from first channel")
     case res := <- channel2:
         fmt.Println("Received from second channel", res)
+    default:
+        fmt.Println("Neither made it on time") //Always available
     } 
 }
 
