@@ -2,27 +2,30 @@ package main
 
 import (
     "fmt"
-    "sync"
     "time"
 )
 
-func expensiveTask(id int) {
-    fmt.Printf("Worker %d starting\n", id)
+func oneSecondTask(results chan string){
     time.Sleep(time.Second)
-    fmt.Printf("Worker %d done\n", id)
+    results <- "Done"
 }
-func main() {
 
-    var wg sync.WaitGroup
-    for i := 1; i <= 5; i++ {
-        wg.Add(1)
-        i := i
-        go func() {
-            defer wg.Done()
-            expensiveTask(i)
-        }()
-    }
-    wg.Wait()
+func twoSecondsTask(results chan string){
+    time.Sleep(2 * time.Second)
+    results <- "Done"
+}
+
+func main() {
+    channel1 := make(chan string)
+    channel2 := make(chan string)
+    go oneSecondTask(channel1)
+    go twoSecondsTask(channel2)
+    select {
+    case <- channel1:
+        fmt.Println("Received from first channel") //Happens first
+    case res := <- channel2:
+        fmt.Println("Received from second channel", res)
+    } 
 }
 
 
